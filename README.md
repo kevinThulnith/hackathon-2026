@@ -62,6 +62,47 @@ We have included a test suite that programmatically proves all Milestones (inclu
 uv run test.py
 ```
 
+## Docker execution
+
+create `.env` on project root and this data.
+
+```sh
+# Postgres Settings
+POSTGRES_DB=hackathonDatabase
+POSTGRES_USER=hackathonDbUser
+POSTGRES_PASSWORD=hackathonDB4080
+
+# Redis Settings
+REDIS_HOST=hackathon-redis
+REDIS_CACHE_DB=1
+REDIS_PORT=6379
+REDIS_ADDR=redis://hackathon-redis:6379
+
+# Database Settings
+DATABASE_ENGINE=postgresql_psycopg2
+DATABASE_NAME=hackathonDatabase
+DATABASE_USERNAME=hackathonDbUser
+DATABASE_PASSWORD=hackathonDB4080
+DATABASE_HOST=hackathon-database
+DATABASE_PORT=5432
+DATABASE_URL=postgresql://hackathonDbUser:hackathonDB4080@hackathon-database:5432/hackathonDatabase
+DATA_SOURCE_NAME=postgresql://hackathonDbUser:hackathonDB4080@hackathon-database:5432/hackathonDatabase?sslmode=disable
+
+# Backend Settings
+DEBUG=False
+API_PORT=8000
+JWT_SECRET=%rb#(d#^1g1vrivi08v%_bhkim6rn1i#sf%y$)%*e$$ynsjjat
+SECRET_KEY=tl5$^=@msts_q4=^3et%$@kgmwctj=)5c%kkzima#tq-2o9lcl
+CORS_ORIGINS=http://localhost,http://host.docker.internal,http://host.docker.internal:80
+ALLOWED_HOSTS=localhost,host.docker.internal,127.0.0.1,localhost:5173,localhost:8000,127.0.0.1:8000,127.0.0.1:5173,
+```
+
+execute all services
+
+```sh
+docker-compose up -d --build
+```
+
 ---
 
 ## 📐 Justification of Assumed Constants & Physics Math
