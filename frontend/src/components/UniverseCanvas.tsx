@@ -15,8 +15,6 @@ interface UniverseCanvasProps {
   onPlanetClick: (nodeId: string) => void;
 }
 
-const SCALE = 1.2;
-const OFFSET_X = 150;
 export const UniverseCanvas: React.FC<UniverseCanvasProps> = ({ nodes, pathTaken, onPlanetClick }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -43,23 +41,36 @@ export const UniverseCanvas: React.FC<UniverseCanvasProps> = ({ nodes, pathTaken
     return () => window.removeEventListener('resize', resizeCanvas);
   }, [nodes, pathTaken]);
 
+  const calculateTransform = (canvasW: number, canvasH: number, nodes: PlanetNode[]) => {
+    if (nodes.length === 0) return { dynamicScale: 1, centerX: 0, centerY: 0 };
+    const minX = Math.min(...nodes.map(n => n.x));
+    const maxX = Math.max(...nodes.map(n => n.x));
+    const minY = Math.min(...nodes.map(n => n.y));
+    const maxY = Math.max(...nodes.map(n => n.y));
+    
+    const rangeX = maxX - minX || 1;
+    const rangeY = maxY - minY || 1;
+    const padding = 80;
+    const scaleX = Math.max((canvasW - padding * 2) / rangeX, 0.1);
+    const scaleY = Math.max((canvasH - padding * 2) / rangeY, 0.1);
+    const dynamicScale = Math.min(scaleX, scaleY, 1.2);
+
+    return { dynamicScale, centerX: (minX + maxX) / 2, centerY: (minY + maxY) / 2 };
+  };
+
+  const getCoords = (n: PlanetNode, canvasW: number, canvasH: number, transform: any) => {
+    return {
+      x: canvasW / 2 + (n.x - transform.centerX) * transform.dynamicScale,
+      y: canvasH / 2 + (n.y - transform.centerY) * transform.dynamicScale
+    };
+  };
+
   const draw = (ctx: CanvasRenderingContext2D) => {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    // Clear canvas
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    // Center the map a bit based on canvas size
-    const cx = canvas.width / 2 - 250;
-    const cy = canvas.height / 2;
-
-    const getCoords = (n: PlanetNode) => {
-      return {
-        x: cx + (n.x * SCALE) + OFFSET_X,
-        y: cy + (n.y * SCALE)
-      };
-    };
+    const transform = calculateTransform(canvas.width, canvas.height, nodes);
 
     // Draw active routing path
     if (pathTaken && pathTaken.length > 1) {
@@ -68,7 +79,7 @@ export const UniverseCanvas: React.FC<UniverseCanvasProps> = ({ nodes, pathTaken
         const nodeId = pathTaken[i];
         const node = nodes.find(n => n.id === nodeId);
         if (node) {
-          const { x, y } = getCoords(node);
+          const { x, y } = getCoords(node, canvas.width, canvas.height, transform);
           if (i === 0) {
             ctx.moveTo(x, y);
           } else {
@@ -76,52 +87,49 @@ export const UniverseCanvas: React.FC<UniverseCanvasProps> = ({ nodes, pathTaken
           }
         }
       }
-      ctx.strokeStyle = '#00f0ff';
-      ctx.lineWidth = 4;
-      ctx.shadowBlur = 15;
-      ctx.shadowColor = '#00f0ff';
+      ctx.strokeStyle = '#000000'; // Pure Black
+      ctx.lineWidth = 2;
       ctx.stroke();
-      ctx.shadowBlur = 0;
     }
 
     // Draw planets
     nodes.forEach(node => {
-      const { x, y } = getCoords(node);
+      const { x, y } = getCoords(node, canvas.width, canvas.height, transform);
       const visualRadius = Math.max(15, node.radius_km / 1500); // Scale down radius for UI
-
-      // Draw glow
-      ctx.beginPath();
-      ctx.arc(x, y, visualRadius + 10, 0, Math.PI * 2);
-      ctx.fillStyle = node.status === 'offline' ? 'rgba(255, 0, 85, 0.2)' : 'rgba(0, 240, 255, 0.15)';
-      ctx.fill();
 
       // Draw planet core
       ctx.beginPath();
       ctx.arc(x, y, visualRadius, 0, Math.PI * 2);
-      ctx.fillStyle = node.status === 'offline' ? '#ff0055' : '#0b192c';
-      ctx.strokeStyle = node.status === 'offline' ? '#cc0044' : '#00f0ff';
+      ctx.fillStyle = node.status === 'offline' ? '#F0F0F0' : '#FFFFFF'; // Light gray or white core
+      ctx.strokeStyle = node.status === 'offline' ? '#CCCCCC' : '#000000'; // Light gray if offline, black if online
       ctx.lineWidth = 2;
+      if (node.status === 'offline') {
+         ctx.setLineDash([4, 4]); // Dashed line for offline planets
+      } else {
+         ctx.setLineDash([]);
+      }
       ctx.fill();
       ctx.stroke();
+      ctx.setLineDash([]); // Reset line dash for other drawings
 
       // Draw towers around planet
       const towers = node.active_towers;
       for (let i = 0; i < towers; i++) {
         const angle = (i * (Math.PI * 2)) / towers;
-        const tx = x + (visualRadius + 5) * Math.cos(angle);
-        const ty = y + (visualRadius + 5) * Math.sin(angle);
+        const tx = x + (visualRadius + 8) * Math.cos(angle);
+        const ty = y + (visualRadius + 8) * Math.sin(angle);
         
         ctx.beginPath();
         ctx.arc(tx, ty, 2, 0, Math.PI * 2);
-        ctx.fillStyle = node.status === 'offline' ? '#330011' : '#ffffff';
+        ctx.fillStyle = node.status === 'offline' ? '#CCCCCC' : '#000000';
         ctx.fill();
       }
 
       // Draw label
-      ctx.fillStyle = '#ffffff';
+      ctx.fillStyle = '#000000';
       ctx.font = '14px Inter';
       ctx.textAlign = 'center';
-      ctx.fillText(node.id, x, y - visualRadius - 15);
+      ctx.fillText(node.id.toUpperCase(), x, y - visualRadius - 20);
     });
   };
 
@@ -132,13 +140,11 @@ export const UniverseCanvas: React.FC<UniverseCanvasProps> = ({ nodes, pathTaken
     const rect = canvas.getBoundingClientRect();
     const clickX = e.clientX - rect.left;
     const clickY = e.clientY - rect.top;
-
-    const cx = canvas.width / 2 - 250;
-    const cy = canvas.height / 2;
+    
+    const transform = calculateTransform(canvas.width, canvas.height, nodes);
 
     for (const node of nodes) {
-      const nx = cx + (node.x * SCALE) + OFFSET_X;
-      const ny = cy + (node.y * SCALE);
+      const { x: nx, y: ny } = getCoords(node, canvas.width, canvas.height, transform);
       const visualRadius = Math.max(15, node.radius_km / 1500);
 
       // Check distance from click to planet center
