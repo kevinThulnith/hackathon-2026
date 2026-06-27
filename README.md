@@ -1,14 +1,14 @@
-# 🪐 Zeta-26 Relic Ring Protocol
+# Zeta-26 Relic Ring Protocol
 
 **Launch26 Hackathon - IEEE CS University of Kelaniya**
 
-## 📖 Executive Summary
+## Executive Summary
 
 The Relic Ring Protocol is a highly resilient, physics-based network routing simulation built to reconnect the fragmented Zeta-26 star system. Following the Hyper-Flare of 3704, this system dynamically calculates routing paths across legacy subsurface fiber rings and laser void transmissions, handling planetary data dialects (Codex translations) and hardware failures in real-time.
 
 ---
 
-## 🚀 Key Features (Milestones Achieved)
+## Key Features (Milestones Achieved)
 
 - **M1: Universe Initialization:** Fully dynamic parsing of `universe-config.json`. No planetary values are hardcoded.
 - **M2: Multi-Hop Proof:** Accurate numerical base conversion mapping internal ASCII representation to the required outbound Codex dialects.
@@ -17,7 +17,7 @@ The Relic Ring Protocol is a highly resilient, physics-based network routing sim
 
 ---
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 - **Backend Core:** Python 3 (optimal for math, trigonometry, and graph algorithms)
 - **API Framework:** Django (lightweight app structure via `manage.py`)
@@ -25,7 +25,7 @@ The Relic Ring Protocol is a highly resilient, physics-based network routing sim
 
 ---
 
-## ⚙️ Setup & Running Instructions
+## Setup & Running Instructions
 
 ### 1. Prerequisites
 
@@ -105,7 +105,7 @@ docker-compose up -d --build
 
 ---
 
-## 📐 Justification of Assumed Constants & Physics Math
+## Justification of Assumed Constants & Physics Math
 
 As per the technical requirements, the system strictly adheres to the provided physics formulas and system assumptions:
 
@@ -123,7 +123,7 @@ Dijkstra's shortest-path algorithm is strictly constrained by $L_{max} = 50{,}00
 
 ---
 
-## 📡 API Reference
+## API Reference
 
 | Endpoint         | Method | Payload / Action                                                                                                        |
 | ---------------- | ------ | ----------------------------------------------------------------------------------------------------------------------- |
@@ -133,7 +133,7 @@ Dijkstra's shortest-path algorithm is strictly constrained by $L_{max} = 50{,}00
 
 ---
 
-## 💻 Frontend Development Steps (Next Phase)
+## Frontend Development Steps (Next Phase)
 
 To successfully demonstrate the visual requirements of the 10–15 minute demo video, a frontend visualization will be developed with the following steps:
 
