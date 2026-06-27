@@ -43,26 +43,126 @@ services:
   hackathon-backend:
     build:
       context: ./backend
+      dockerfile: Dockerfile
     container_name: hackathon-backend
+    volumes:
+      - hackathon-media-files:/app/media
+      - hackathon-backend-logs:/app/logs
     ports:
-      - "8000:8000"
-    depends_on:
-      - hackathon-database
+      - "127.0.0.1:8000:8000"
     env_file:
-      - ./backend/.env
+      - .env
+    depends_on:
+      hackathon-database:
+        condition: service_healthy
     networks:
       - hackathon-network
     restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "100m"
+        max-file: "10"
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "wget --quiet --tries=1 --spider http://127.0.0.1:8000/api/health/ || exit 1",
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 1G
+        reservations:
+          cpus: "0.5"
+          memory: 512M
 
   hackathon-frontend:
     build:
       context: ./frontend
+      dockerfile: Dockerfile
     container_name: hackathon-frontend
-    ports:
-      - "3000:80"
+    volumes:
+      - hackathon-frontend-dist:/frontend-dist
+    env_file:
+      - .env
     networks:
       - hackathon-network
+    restart: "no" # one-shot builder — exits after copying files to volume
+    security_opt:
+      - no-new-privileges:true
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "50m"
+        max-file: "5"
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 1G
+
+  hackathon-proxy:
+    build:
+      context: ./proxy
+      dockerfile: Dockerfile
+    container_name: hackathon-proxy
+    volumes:
+      - hackathon-frontend-dist:/usr/share/nginx/html:ro
+      - hackathon-media-files:/app/media
+    ports:
+      - "80:80"
+      - "443:443"
+    networks:
+      - hackathon-network
+    depends_on:
+      hackathon-frontend:
+        condition: service_completed_successfully
+      hackathon-backend:
+        condition: service_started
     restart: unless-stopped
+    # Security hardening
+    read_only: true
+    tmpfs:
+      - /tmp
+      - /var/cache/nginx
+      - /var/run
+    security_opt:
+      - no-new-privileges:true
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "100m"
+        max-file: "10"
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "wget",
+          "--quiet",
+          "--tries=1",
+          "--spider",
+          "http://127.0.0.1/health",
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 512M
+        reservations:
+          cpus: "0.25"
+          memory: 128M
 
 networks:
   hackathon-network:
@@ -71,3 +171,6 @@ networks:
 volumes:
   hackathon-database-data:
   hackathon-logs:
+  hackathon-media-files:
+  hackathon-backend-logs:
+  hackathon-frontend-dist:

@@ -1,0 +1,95 @@
+# Development files
+
+.env
+.env.\*
+_.env
+_.env.\*
+
+# Database files
+
+_.sqlite3
+db.sqlite3
+_.db
+
+# Python cache and compiled files
+
+**pycache**/
+_.py[cod]
+_$py.class
+_.so
+.Python
+_.egg-info/
+dist/
+build/
+
+# Virtual environments
+
+venv/
+env/
+ENV/
+.venv/
+
+# IDE and editor files
+
+.vscode/
+.idea/
+_.swp
+_.swo
+\*~
+.DS_Store
+Thumbs.db
+
+# Version control
+
+.git/
+.gitignore
+
+# Documentation
+
+README.md
+\*.md
+
+# Testing
+
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.cache/
+
+# Static files (if collected during build)
+
+staticfiles/
+static/
+
+# Media files (except essential ones)
+
+media/invoices/\*.pdf
+
+# Logs
+
+\*.log
+logs/
+
+# Docker related
+
+Dockerfile
+.dockerignore
+docker-compose\*.yml
+
+# OS generated files
+
+.DS*Store
+.DS_Store?
+.*\*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Python package files
+
+_.egg
+_.egg-info/
+.venv/
+dist/

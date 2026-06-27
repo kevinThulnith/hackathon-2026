@@ -1,0 +1,42 @@
+# Build outputs (we build inside Docker)
+dist
+dist-ssr
+
+# Dependencies (we install inside Docker)
+node_modules
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Environment files
+.env
+.env.*
+*.local
+
+# Editor directories and files
+.vscode
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Docker files
+Dockerfile*
+.dockerignore
+
+# Testing
+coverage
+.nyc_output
+
+# Other
+.vercel
+.netlify

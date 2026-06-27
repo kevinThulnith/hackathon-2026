@@ -83,7 +83,7 @@ def route_packet(request):
             "current_id": path_nodes[-1],  # Packet has arrived
             "payload": payload,  # Re-decoded at final destination
             "total_latency_seconds": round(total_latency_seconds, 6),
-            "path_taken": path_nodes, 
+            "path_taken": path_nodes,
             "hop_log": hop_log,
         }
 
@@ -104,3 +104,8 @@ def toggle_node(request):
         else:
             universe.revive_node(node_id)
             return JsonResponse({"status": f"{node_id} back online!"})
+
+
+def HealthCheckView(request):
+    "Health Check Endpoint"
+    return JsonResponse({"status": "healthy"})
