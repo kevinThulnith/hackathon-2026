@@ -1,0 +1,28 @@
+# Python-generated files
+*__pycache__/
+*.egg-info
+*.sqlite3
+*.py[oc]
+wheels/
+build/
+dist/
+
+# Virtual environments
+backend/media/invoices/
+.venv/
+.env
+.env.*
+
+# Project files
+.DS_Store
+.vscode/
+.idea/
+*.log
+schema/*.jpg
+testsprite_tests/
+backend/static/
+
+# k8s
+k8s/metrics-server.yaml
+k8s/secrets.yaml
+*.pem

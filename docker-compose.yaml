@@ -1,0 +1,49 @@
+name: hackathon
+
+services:
+  hackathon-database:
+    image: postgres:14-alpine
+    container_name: hackathon-database
+    volumes:
+      - hackathon-database-data:/var/lib/postgresql/data
+      - hackathon-logs:/var/log/postgresql
+    ports:
+      - "127.0.0.1:5432:5432"
+    env_file:
+      - .env
+    networks:
+      - hackathon-network
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "100m"
+        max-file: "10"
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-postgres}",
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 1G
+        reservations:
+          cpus: "0.5"
+          memory: 512M
+
+networks:
+  hackathon-network:
+    driver: bridge
+
+volumes:
+  hackathon-database-data:
+  hackathon-logs:
