@@ -8,7 +8,7 @@ services:
       - hackathon-database-data:/var/lib/postgresql/data
       - hackathon-logs:/var/log/postgresql
     ports:
-      - "127.0.0.1:5432:5432"
+      - "127.0.0.1:5433:5432"
     env_file:
       - .env
     networks:
@@ -39,6 +39,30 @@ services:
         reservations:
           cpus: "0.5"
           memory: 512M
+
+  hackathon-backend:
+    build:
+      context: ./backend
+    container_name: hackathon-backend
+    ports:
+      - "8000:8000"
+    depends_on:
+      - hackathon-database
+    env_file:
+      - ./backend/.env
+    networks:
+      - hackathon-network
+    restart: unless-stopped
+
+  hackathon-frontend:
+    build:
+      context: ./frontend
+    container_name: hackathon-frontend
+    ports:
+      - "3000:80"
+    networks:
+      - hackathon-network
+    restart: unless-stopped
 
 networks:
   hackathon-network:
